@@ -25,7 +25,22 @@ def lambda_handler(event, context):
                 'RestrictPublicBuckets': True
             }
         )
+    # 1. Force the bucket back to Private
+        s3_client.put_public_access_block(
+            Bucket=bucket_name,
+            PublicAccessBlockConfiguration={
+                'BlockPublicAcls': True,
+                'IgnorePublicAcls': True,
+                'BlockPublicPolicy': True,
+                'RestrictPublicBuckets': True
+            }
+        )
         
+        # 2. Force Versioning back ON (Defeat Ransomware)
+        s3_client.put_bucket_versioning(
+            Bucket=bucket_name,
+            VersioningConfiguration={'Status': 'Enabled'}
+        )       
         print(f"✅ SUCCESS: Security Baseline restored on {bucket_name}.")
         return {
             'statusCode': 200,
@@ -38,3 +53,4 @@ def lambda_handler(event, context):
             'statusCode': 500,
             'body': json.dumps('Failed to process event')
         }
+
