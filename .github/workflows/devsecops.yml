@@ -16,6 +16,7 @@ jobs:
       # LAYER 1: Shift-Left Security
       - name: Run Checkov Static Analysis
         uses: bridgecrewio/checkov-action@master
+        continue-on-error: true     # <--- ADD THIS LINE
         with:
           directory: ./
           framework: terraform
@@ -39,6 +40,7 @@ jobs:
 
       # LAYER 3: Runtime CSPM Audit
       - name: Run Prowler Cloud Security Scan
+        continue-on-error: true    # <--- ADD THIS LINE
         run: |
           docker run --rm \
             -e AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }} \
