@@ -27,7 +27,6 @@ resource "aws_s3_bucket_public_access_block" "initial_lock" {
   ignore_public_acls      = true
   restrict_public_buckets = true
 }
-resource "aws_s3_bucket" "secure_assets" {
   bucket = "mtech-secure-target-20260616091251135000000001" # Keep your existing bucket name!
   
   # checkov:skip=CKV_AWS_145: "Risk Accepted: Using AES256 instead of KMS to avoid KMS costs in lab environment."
