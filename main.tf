@@ -65,7 +65,7 @@ data "archive_file" "lambda_zip" {
 # ==========================================
 resource "aws_lambda_function" "s3_remediator" {
   filename         = data.archive_file.lambda_zip.output_path
-  function_name    = "mtech-s3-auto-remediator-v2"
+  function_name    = "mtech-s3-auto-remediator-v3"
   role             = aws_iam_role.lambda_exec_role.arn
   handler          = "lambda_function.lambda_handler"
   runtime          = "python3.11"
@@ -83,7 +83,7 @@ resource "aws_lambda_function" "s3_remediator" {
 # 4. IAM PERMISSIONS
 # ==========================================
 resource "aws_iam_role" "lambda_exec_role" {
-  name = "mtech-lambda-remediator-role-v2"
+  name = "mtech-lambda-remediator-role-v3"
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [{
@@ -95,7 +95,7 @@ resource "aws_iam_role" "lambda_exec_role" {
 }
 
 resource "aws_iam_role_policy" "lambda_s3_policy" {
-  name = "mtech-lambda-s3-policy-v2"
+  name = "mtech-lambda-s3-policy-v3"
   role = aws_iam_role.lambda_exec_role.id
   policy = jsonencode({
     Version = "2012-10-17"
@@ -121,7 +121,7 @@ resource "aws_iam_role_policy" "lambda_s3_policy" {
 # 5. EVENTBRIDGE (The Router/Tripwire)
 # ==========================================
 resource "aws_cloudwatch_event_rule" "s3_public_access_removed" {
-  name        = "mtech-s3-public-access-alert-v2"
+  name        = "mtech-s3-public-access-alert-v3"
   description = "Triggers Lambda when S3 Public Access Block is deleted via CloudTrail"
 
   event_pattern = jsonencode({
