@@ -35,7 +35,7 @@ jobs:
         run: prowler aws --compliance cis_2.0_aws -M csv html
 
       - name: Upload Compliance Artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: prowler-compliance-reports
           path: output/
