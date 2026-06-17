@@ -65,7 +65,7 @@ data "archive_file" "lambda_zip" {
 # ==========================================
 resource "aws_lambda_function" "s3_remediator" {
   filename         = data.archive_file.lambda_zip.output_path
-  function_name    = "mtech-s3-auto-remediator"
+  function_name    = "mtech-s3-auto-remediator-v2"
   role             = aws_iam_role.lambda_exec_role.arn
   handler          = "lambda_function.lambda_handler"
   runtime          = "python3.11"
