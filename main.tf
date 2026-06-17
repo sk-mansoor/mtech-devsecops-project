@@ -62,6 +62,7 @@ resource "aws_lambda_function" "remediation_bot" {
   # checkov:skip=CKV_AWS_272: "Risk Accepted: Code signing not required for lab environment."
   # checkov:skip=CKV_AWS_50: "Risk Accepted: X-Ray tracing disabled to reduce lab noise."
   # checkov:skip=CKV_AWS_116: "Risk Accepted: Dead Letter Queue (DLQ) not required for demo."
+}
 # ==========================================
 # 4. IAM PERMISSIONS
 # ==========================================
@@ -101,6 +102,7 @@ resource "aws_iam_role_policy" "lambda_policy" {
 
   # checkov:skip=CKV_AWS_289: "Risk Accepted: IAM permissions are strictly scoped to demo resources."
   # checkov:skip=CKV_AWS_355: "Risk Accepted: Wildcard required for specific CloudWatch log streams."
+}
 # ==========================================
 # 5. EVENTBRIDGE (The Router/Tripwire)
 # ==========================================
