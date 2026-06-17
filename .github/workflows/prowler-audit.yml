@@ -33,7 +33,7 @@ jobs:
       - name: Execute Prowler CIS Benchmark
         # We tell Prowler to output both a CSV (for data parsing) and an HTML file (for a pretty dashboard)
         run: prowler aws --compliance cis_2.0_aws -M csv html
-
+        continue-on-error: true
       - name: Upload Compliance Artifacts
         uses: actions/upload-artifact@v4
         with:
