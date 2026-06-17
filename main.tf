@@ -15,7 +15,7 @@ provider "aws" {
 # 1. THE TARGET INFRASTRUCTURE
 # ==========================================
 resource "aws_s3_bucket" "secure_assets" {
-  bucket_prefix        = "mtech-secure-target-20260616091251135000000001"
+  bucket_prefix = "mtech-secure-target-"
   force_destroy = true
 
   # checkov:skip=CKV_AWS_145: "Risk Accepted: Using AES256 instead of KMS to avoid KMS costs in lab environment."
