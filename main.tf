@@ -15,8 +15,12 @@ provider "aws" {
 # 1. THE TARGET INFRASTRUCTURE
 # ==========================================
 resource "aws_s3_bucket" "secure_assets" {
-  bucket_prefix = "mtech-secure-target-"
+  bucket        = "mtech-secure-target-20260616091251135000000001"
   force_destroy = true
+
+  # checkov:skip=CKV_AWS_145: "Risk Accepted: Using AES256 instead of KMS to avoid KMS costs in lab environment."
+  # checkov:skip=CKV_AWS_144: "Risk Accepted: Cross-region replication not required for M.Tech demo."
+  # checkov:skip=CKV_AWS_18: "Risk Accepted: Access logging is handled via separate remediation."
 }
 
 resource "aws_s3_bucket_public_access_block" "initial_lock" {
@@ -27,11 +31,25 @@ resource "aws_s3_bucket_public_access_block" "initial_lock" {
   ignore_public_acls      = true
   restrict_public_buckets = true
 }
-  bucket = "mtech-secure-target-20260616091251135000000001" # Keep your existing bucket name!
-  
-  # checkov:skip=CKV_AWS_145: "Risk Accepted: Using AES256 instead of KMS to avoid KMS costs in lab environment."
-  # checkov:skip=CKV_AWS_144: "Risk Accepted: Cross-region replication not required for M.Tech demo."
-  # checkov:skip=CKV_AWS_18: "Risk Accepted: Access logging is handled via separate remediation."
+
+# --- ENFORCE VERSIONING (Ransomware Protection) ---
+resource "aws_s3_bucket_versioning" "secure_versioning" {
+  bucket = aws_s3_bucket.secure_assets.id
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+
+# --- ENFORCE ENCRYPTION (Data Leak Protection) ---
+resource "aws_s3_bucket_server_side_encryption_configuration" "secure_encryption" {
+  bucket = aws_s3_bucket.secure_assets.id
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm = "AES256"
+    }
+  }
+}
+
 # ==========================================
 # 2. AUTOMATIC CODE PACKAGING
 # ==========================================
@@ -53,9 +71,6 @@ resource "aws_lambda_function" "s3_remediator" {
   runtime          = "python3.11"
   timeout          = 10
   source_code_hash = data.archive_file.lambda_zip.output_base64sha256
-}
-resource "aws_lambda_function" "remediation_bot" {
-  # ... your existing lambda code ...
 
   # checkov:skip=CKV_AWS_115: "Risk Accepted: Concurrency limit not needed for single-event demo."
   # checkov:skip=CKV_AWS_117: "Risk Accepted: VPC deployment not required for basic API remediation."
@@ -63,6 +78,7 @@ resource "aws_lambda_function" "remediation_bot" {
   # checkov:skip=CKV_AWS_50: "Risk Accepted: X-Ray tracing disabled to reduce lab noise."
   # checkov:skip=CKV_AWS_116: "Risk Accepted: Dead Letter Queue (DLQ) not required for demo."
 }
+
 # ==========================================
 # 4. IAM PERMISSIONS
 # ==========================================
@@ -96,13 +112,11 @@ resource "aws_iam_role_policy" "lambda_s3_policy" {
       }
     ]
   })
-}
-resource "aws_iam_role_policy" "lambda_policy" {
-  # ... your existing policy code ...
 
   # checkov:skip=CKV_AWS_289: "Risk Accepted: IAM permissions are strictly scoped to demo resources."
   # checkov:skip=CKV_AWS_355: "Risk Accepted: Wildcard required for specific CloudWatch log streams."
 }
+
 # ==========================================
 # 5. EVENTBRIDGE (The Router/Tripwire)
 # ==========================================
@@ -132,21 +146,4 @@ resource "aws_lambda_permission" "allow_eventbridge" {
   function_name = aws_lambda_function.s3_remediator.function_name
   principal     = "events.amazonaws.com"
   source_arn    = aws_cloudwatch_event_rule.s3_public_access_removed.arn
-}
-# --- ENFORCE VERSIONING (Ransomware Protection) ---
-resource "aws_s3_bucket_versioning" "secure_versioning" {
-  bucket = aws_s3_bucket.secure_assets.id
-  versioning_configuration {
-    status = "Enabled"
-  }
-}
-
-# --- ENFORCE ENCRYPTION (Data Leak Protection) ---
-resource "aws_s3_bucket_server_side_encryption_configuration" "secure_encryption" {
-  bucket = aws_s3_bucket.secure_assets.id
-  rule {
-    apply_server_side_encryption_by_default {
-      sse_algorithm = "AES256"
-    }
-  }
 }
