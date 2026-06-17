@@ -137,7 +137,7 @@ resource "aws_cloudwatch_event_rule" "s3_public_access_removed" {
     "detail-type": ["AWS API Call via CloudTrail"],
     "detail": {
       "eventSource": ["s3.amazonaws.com"],
-      "eventName": ["DeleteBucketPublicAccessBlock", "PutBucketPublicAccessBlock"]
+      "eventName": ["DeleteBucketPublicAccessBlock", ]
     }
   })
 }
