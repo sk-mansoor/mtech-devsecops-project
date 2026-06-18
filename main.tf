@@ -1,4 +1,9 @@
 terraform {
+  backend "s3" {
+    bucket = "mtech-terraform-state-memory-852369" # Use the exact name of the bucket you just made
+    key    = "devsecops/terraform.tfstate"
+    region = "us-east-1"
+  }
   required_providers {
     aws = {
       source  = "hashicorp/aws"
