@@ -109,7 +109,12 @@ resource "aws_iam_role_policy" "lambda_s3_policy" {
     Version = "2012-10-17"
     Statement = [
       {
-        Action   = ["s3:PutBucketPublicAccessBlock", "s3:GetBucketPublicAccessBlock"]
+        "Action": [
+        "s3:PutBucketPublicAccessBlock",
+        "s3:GetPublicAccessBlock",
+        "s3:PutBucketVersioning",
+        "s3:GetBucketVersioning"
+      ],
         Effect   = "Allow"
         Resource = "*" 
       },
@@ -139,7 +144,8 @@ resource "aws_cloudwatch_event_rule" "s3_public_access_removed" {
       "eventSource": ["s3.amazonaws.com"],
       "eventName": [
         "DeleteBucketPublicAccessBlock",
-        "PutBucketPublicAccessBlock"
+        "PutBucketPublicAccessBlock",
+        "PutBucketVersioning"
       ]
     }
   })
